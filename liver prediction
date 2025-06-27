@@ -1,0 +1,934 @@
+# IMPORTING LIBRARIES
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+%matplotlib inline
+import seaborn as sns
+import warnings
+warnings.filterwarnings('ignore')
+from numpy import mean
+from numpy import std
+
+# LOADING THE DATASET
+
+df = pd.read_excel('HealthCareData.xlsx')
+df.head()
+
+# ROWS & COLUMNS IN THE DATASET
+
+rows, columns = df.shape
+
+print(f'Total number of rows: {rows}')
+print(f'Total number of columns: {columns}')
+
+df.describe()
+
+df['Diabetes Result'].unique()
+
+df['Gender'].value_counts()
+
+df['Gender'] = df['Gender'].replace('female ','female')
+
+df['Gender'].value_counts()
+
+df = df.rename(columns={'Predicted Value(Out Come-Patient suffering from liver  cirrosis or not)' : 'Outcome'})
+df.head()
+
+df['Outcome'].unique()
+
+df['Diabetes Result'].value_counts()
+
+df.columns
+
+df.shape
+
+df.isnull().any()
+
+df.isnull().sum()
+
+df.duplicated().sum()
+
+# This code selects all object-type columns (categorical data) from the DataFrame `df` and retrieves their column names.
+
+categorical_features = df.select_dtypes(include=[np.object])
+categorical_features.columns
+
+#This code selects all numeric-type columns from the DataFrame `df` and retrieves their column names.
+
+numeric_features = df.select_dtypes(include=[np.number])
+numeric_features.columns
+
+df.info()
+
+df['TCH']=df['TCH'].fillna(df['TCH'].mean())
+df['HDL']=df['HDL'].fillna(df['HDL'].mean())
+df['PCV  (%)']=df['PCV  (%)'].fillna(df['PCV  (%)'].mean())
+df['RBC  (million cells/microliter)']=df['RBC  (million cells/microliter)'].fillna(df['RBC  (million cells/microliter)'].mean())
+df['MCV   (femtoliters/cell)']=df['MCV   (femtoliters/cell)'].fillna(df['MCV   (femtoliters/cell)'].mean())
+df['MCH  (picograms/cell)']=df['MCH  (picograms/cell)'].fillna(df['MCH  (picograms/cell)'].mean())
+df['MCHC  (grams/deciliter)']=df['MCHC  (grams/deciliter)'].fillna(df['MCHC  (grams/deciliter)'].mean())
+df['Total Count']=df['Total Count'].fillna(df['Total Count'].mean())
+df['Monocytes   (%)']=df['Monocytes   (%)'].fillna(df['Monocytes   (%)'].mean())
+df['Eosinophils   (%)']=df['Eosinophils   (%)'].fillna(df['Eosinophils   (%)'].mean())
+df['Basophils  (%)']=df['Basophils  (%)'].fillna(df['Basophils  (%)'].mean())
+df['Indirect     (mg/dl)']=df['Indirect     (mg/dl)'].fillna(df['Indirect     (mg/dl)'].mean())
+df['Total Protein     (g/dl)']=df['Total Protein     (g/dl)'].fillna(df['Total Protein     (g/dl)'].mean())
+df['Albumin   (g/dl)']=df['Albumin   (g/dl)'].fillna(df['Albumin   (g/dl)'].mean())
+df['Globulin  (g/dl)']=df['Globulin  (g/dl)'].fillna(df['Globulin  (g/dl)'].mean())
+df['AL.Phosphatase      (U/L)']=df['AL.Phosphatase      (U/L)'].fillna(df['AL.Phosphatase      (U/L)'].mean())
+df['Place(location where the patient lives)']=df['Place(location where the patient lives)'].fillna(df['Place(location where the patient lives)'].mode()[0])
+df['TG']=df['TG'].fillna(df['TG'].mode()[0])
+df['LDL']=df['LDL'].fillna(df['LDL'].mode()[0])
+df['Outcome']=df['Outcome'].fillna(df['Outcome'].mode()[0])
+df['Total Bilirubin    (mg/dl)']=df['Total Bilirubin    (mg/dl)'].fillna(df['Total Bilirubin    (mg/dl)'].mode()[0])
+
+df['A/G Ratio']=df['A/G Ratio'].fillna(df['A/G Ratio'].mode()[0])
+
+df.isnull().sum()
+
+df['Total Bilirubin    (mg/dl)'].unique()
+
+df['A/G Ratio'].unique()
+
+df.drop(['A/G Ratio', 'Total Bilirubin    (mg/dl)','S.NO'], axis = 1, inplace = True)
+
+df['TG'].unique()
+
+df[df['TG'].isin(['130LDL'])]
+
+df.drop(df.index[[588]],inplace=True,axis=0)
+
+df['TG'].unique()
+
+# This code calculates the skewness for each numeric column in the DataFrame `df`.
+
+df.skew()
+
+sns.countplot(data=df,x='Gender')
+plt.title('The count of Gender',size = 15,loc='left')
+
+sns.countplot(data=df,x='Place(location where the patient lives)')
+plt.title("Location",color='y',size=20,loc='left')
+plt.show()
+
+plt.figure(figsize=(10,5))
+plt.pie(df.Outcome.value_counts().values,labels=['Yes','No'],autopct='%1.2f%%')
+plt.title('Outcome',color='violet',size=20)
+
+sns.boxplot(x='Age',y='Outcome',data=df,hue='Gender')
+plt.title('Gender vs Outcome',color='red',size=20)
+plt.show()
+
+sns.boxplot(df['Age'])
+
+sns.catplot(x='Outcome',hue='Gender',data=df,kind='count',height=3)
+
+sns.boxplot(x='Place(location where the patient lives)',y='Age',data=df)
+plt.title('Place vs Age',color='red',size=20)
+
+sns.barplot(x=df['Place(location where the patient lives)'],y=df['Age'])
+
+plt.figure(figsize=(20,15))
+sns.heatmap(df.corr(),annot=True)
+plt.show()
+
+df.drop(['SGPT/ALT (U/L)'],axis=1,inplace=True)
+
+pd.crosstab(df['Age'],df['Diabetes Result'])
+
+sns.heatmap(pd.crosstab(df['Age'],df['Gender']))
+
+sns.histplot(df['Diabetes Result'])
+
+for i in df.columns:
+    if type(df[i][0])!=str:
+        sns.boxplot(df[i])
+        plt.title(i)
+        plt.show()
+
+sns.histplot(df['Duration of alcohol consumption(years)'])
+np.percentile(df['Duration of alcohol consumption(years)'],[25,75])
+
+sns.histplot(df['Age'])
+np.percentile(df['Age'],[25,75])
+
+sns.boxplot(data=df,x='Gender',y='Duration of alcohol consumption(years)')
+plt.title('Duration of alcohol consumption(years) comparing with Gender',color='Red',size=20)
+
+sns.boxplot(data=df,x='Duration of alcohol consumption(years)',y='Age')
+plt.title('Duration of alcohol consumption(years) comparing with Age',color='Red',size=20)
+plt.show()
+
+sns.boxplot(data=df,x='Quantity of alcohol consumption (quarters/day)',y='Age')
+plt.title('Quantity of alcohol consumption (quarters/day) comparing with Age',color='Red',size=20)
+plt.show()
+
+sns.boxplot(data=df,x='Duration of alcohol consumption(years)',y='Gender')
+plt.title('Duration of alcohol consumption(years) comparing with Gender',color='Red',size=20)
+plt.show()
+
+sns.distplot(df['Age'])
+
+sns.boxplot(df['Age'])
+
+sns.boxplot(df['TCH'])
+
+# This code calculates the upper and lower limits for the 'Age' column using the mean and standard deviation, where the limits are three standard deviations away from the mean, and then prints these values.
+
+upper_limit = df['Age'].mean() + 3*df['Age'].std()
+lower_limit = df['Age'].mean() - 3*df['Age'].std()
+print('upper limit :',upper_limit)
+print('lower limit:' , lower_limit)
+
+# This code selects and displays rows from the DataFrame `df` where the 'Age' column values are either above the calculated upper limit or below the calculated lower limit.
+
+df.loc[(df['Age'] > upper_limit) | (df['Age'] < lower_limit)]
+
+new_df = df.loc[(df['Age'] < upper_limit) | (df['Age'] > lower_limit)]
+print("old data:", len(df))
+print("new data:", len(new_df))
+
+new_df = df.copy()
+new_df.loc[new_df['Age'] > upper_limit, 'Age'  ] = upper_limit
+new_df.loc[new_df['Age'] < lower_limit, 'Age'  ] = lower_limit
+
+sns.boxplot(df['Age'])
+
+len(new_df)
+
+q1 = df['Age'].quantile(0.25)
+q3 = df['Age'].quantile(0.75)
+iqr = q3 - q1
+
+q1,q3,iqr
+
+upper_limit = q3 + (1.5*iqr)
+lower_limit = q1 - (1.5*iqr)
+lower_limit , upper_limit
+
+df['Age'] = np.where(df['Age'] > upper_limit , upper_limit ,
+                         np.where(df['Age'] < lower_limit , lower_limit , df['Age']))
+
+sns.boxplot(df['Age'])
+
+sns.boxplot(df['Age'])
+
+sns.boxplot(df['Duration of alcohol consumption(years)'])
+
+q1 = df['Duration of alcohol consumption(years)'].quantile(0.25)
+q3 = df['Duration of alcohol consumption(years)'].quantile(0.75)
+iqr = q3 - q1
+
+q1,q3,iqr
+
+upper_limit = q3 + (1.5*iqr)
+lower_limit = q1 - (1.5*iqr)
+lower_limit , upper_limit
+
+df['Duration of alcohol consumption(years)'] = np.where(df['Duration of alcohol consumption(years)'] > upper_limit , upper_limit ,
+                         np.where(df['Duration of alcohol consumption(years)'] < lower_limit , lower_limit , df['Duration of alcohol consumption(years)']))
+
+sns.boxplot(df['Duration of alcohol consumption(years)'])
+
+sns.boxplot(df['TCH'])
+
+q1 = df['TCH'].quantile(0.25)
+q3 = df['TCH'].quantile(0.75)
+iqr = q3 - q1
+
+q1,q3,iqr
+
+upper_limit = q3 + (1.5*iqr)
+lower_limit = q1 - (1.5*iqr)
+lower_limit , upper_limit
+
+df['TCH'] = np.where(df['TCH'] > upper_limit , upper_limit ,
+                         np.where(df['TCH'] < lower_limit , lower_limit , df['TCH']))
+
+sns.boxplot(df['TCH'])
+
+sns.boxplot(df['Quantity of alcohol consumption (quarters/day)'])
+
+q1 = df['Quantity of alcohol consumption (quarters/day)'].quantile(0.25)
+q3 = df['Quantity of alcohol consumption (quarters/day)'].quantile(0.75)
+iqr = q3 - q1
+
+q1,q3,iqr
+
+upper_limit = q3 + (1.5*iqr)
+lower_limit = q1 - (1.5*iqr)
+lower_limit , upper_limit
+
+df['Quantity of alcohol consumption (quarters/day)'] = np.where(df['Quantity of alcohol consumption (quarters/day)'] > upper_limit , upper_limit ,
+                         np.where(df['Quantity of alcohol consumption (quarters/day)'] < lower_limit , lower_limit , df['Quantity of alcohol consumption (quarters/day)']))
+
+sns.boxplot(df['Quantity of alcohol consumption (quarters/day)'])
+
+sns.boxplot(df['TG'])
+
+q1 = df['TG'].quantile(0.25)
+q3 = df['TG'].quantile(0.75)
+iqr = q3 - q1
+q1,q3,iqr
+upper_limit = q3 + (1.5*iqr)
+lower_limit = q1 - (1.5*iqr)
+lower_limit , upper_limit
+
+df['TG'] = np.where(df['TG'] > upper_limit , upper_limit ,
+                         np.where(df['TG'] < lower_limit , lower_limit , df['TG']))
+
+sns.boxplot(df['TG'])
+
+sns.boxplot(df['LDL'])
+
+q1 = df['LDL'].quantile(0.25)
+q3 = df['LDL'].quantile(0.75)
+iqr = q3 - q1
+q1,q3,iqr
+upper_limit = q3 + (1.5*iqr)
+lower_limit = q1 - (1.5*iqr)
+lower_limit , upper_limit
+df['LDL'] = np.where(df['LDL'] > upper_limit , upper_limit ,
+                         np.where(df['LDL'] < lower_limit , lower_limit , df['LDL']))
+
+sns.boxplot(df['LDL'])
+
+sns.boxplot(df['HDL'])
+q1 = df['HDL'].quantile(0.25)
+q3 = df['HDL'].quantile(0.75)
+iqr = q3 - q1
+q1,q3,iqr
+upper_limit = q3 + (1.5*iqr)
+lower_limit = q1 - (1.5*iqr)
+lower_limit , upper_limit
+df['HDL'] = np.where(df['HDL'] > upper_limit , upper_limit ,
+                         np.where(df['HDL'] < lower_limit , lower_limit , df['HDL']))
+
+sns.boxplot(df['HDL'])
+
+sns.boxplot(df['Hemoglobin  (g/dl)'])
+
+1 = df['Hemoglobin  (g/dl)'].quantile(0.25)
+q3 = df['Hemoglobin  (g/dl)'].quantile(0.75)
+iqr = q3 - q1
+q1,q3,iqr
+upper_limit = q3 + (1.5*iqr)
+lower_limit = q1 - (1.5*iqr)
+lower_limit , upper_limit
+df['Hemoglobin  (g/dl)'] = np.where(df['Hemoglobin  (g/dl)'] > upper_limit , upper_limit ,
+                         np.where(df['Hemoglobin  (g/dl)'] < lower_limit , lower_limit , df['Hemoglobin  (g/dl)']))
+
+sns.boxplot(df['Hemoglobin  (g/dl)'])
+
+sns.boxplot(df['PCV  (%)'])
+
+q1 = df['PCV  (%)'].quantile(0.25)
+q3 = df['PCV  (%)'].quantile(0.75)
+iqr = q3 - q1
+q1,q3,iqr
+upper_limit = q3 + (1.5*iqr)
+lower_limit = q1 - (1.5*iqr)
+lower_limit , upper_limit
+df['PCV  (%)'] = np.where(df['PCV  (%)'] > upper_limit , upper_limit ,
+                         np.where(df['PCV  (%)'] < lower_limit , lower_limit , df['PCV  (%)']))
+
+sns.boxplot(df['PCV  (%)'])
+
+sns.boxplot(df['RBC  (million cells/microliter)'])
+
+q1 = df['RBC  (million cells/microliter)'].quantile(0.25)
+q3 = df['RBC  (million cells/microliter)'].quantile(0.75)
+iqr = q3 - q1
+q1,q3,iqr
+upper_limit = q3 + (1.5*iqr)
+lower_limit = q1 - (1.5*iqr)
+lower_limit , upper_limit
+df['RBC  (million cells/microliter)'] = np.where(df['RBC  (million cells/microliter)'] > upper_limit , upper_limit ,
+                         np.where(df['RBC  (million cells/microliter)'] < lower_limit , lower_limit , df['RBC  (million cells/microliter)']))
+
+sns.boxplot(df['MCV   (femtoliters/cell)'])
+
+q1 = df['MCV   (femtoliters/cell)'].quantile(0.25)
+q3 = df['MCV   (femtoliters/cell)'].quantile(0.75)
+iqr = q3 - q1
+q1,q3,iqr
+upper_limit = q3 + (1.5*iqr)
+lower_limit = q1 - (1.5*iqr)
+lower_limit , upper_limit
+df['MCV   (femtoliters/cell)'] = np.where(df['MCV   (femtoliters/cell)'] > upper_limit , upper_limit ,
+                         np.where(df['MCV   (femtoliters/cell)'] < lower_limit , lower_limit , df['MCV   (femtoliters/cell)']))
+
+sns.boxplot(df['MCV   (femtoliters/cell)'])
+
+sns.boxplot(df['MCH  (picograms/cell)'])
+
+q1 = df['MCH  (picograms/cell)'].quantile(0.25)
+q3 = df['MCH  (picograms/cell)'].quantile(0.75)
+iqr = q3 - q1
+q1,q3,iqr
+upper_limit = q3 + (1.5*iqr)
+lower_limit = q1 - (1.5*iqr)
+lower_limit , upper_limit
+df['MCH  (picograms/cell)'] = np.where(df['MCH  (picograms/cell)'] > upper_limit , upper_limit ,
+                         np.where(df['MCH  (picograms/cell)'] < lower_limit , lower_limit , df['MCH  (picograms/cell)']))
+
+sns.boxplot(df['MCH  (picograms/cell)'])
+
+sns.boxplot(df['MCHC  (grams/deciliter)'])
+
+q1 = df['MCHC  (grams/deciliter)'].quantile(0.25)
+q3 = df['MCHC  (grams/deciliter)'].quantile(0.75)
+iqr = q3 - q1
+q1,q3,iqr
+upper_limit = q3 + (1.5*iqr)
+lower_limit = q1 - (1.5*iqr)
+lower_limit , upper_limit
+df['MCHC  (grams/deciliter)'] = np.where(df['MCHC  (grams/deciliter)'] > upper_limit , upper_limit ,
+                         np.where(df['MCHC  (grams/deciliter)'] < lower_limit , lower_limit , df['MCHC  (grams/deciliter)']))
+
+sns.boxplot(df['MCHC  (grams/deciliter)'])
+
+sns.boxplot(df['Total Count'])
+
+q1 = df['Total Count'].quantile(0.25)
+q3 = df['Total Count'].quantile(0.75)
+iqr = q3 - q1
+q1,q3,iqr
+upper_limit = q3 + (1.5*iqr)
+lower_limit = q1 - (1.5*iqr)
+lower_limit , upper_limit
+df['Total Count'] = np.where(df['Total Count'] > upper_limit , upper_limit ,
+                         np.where(df['Total Count'] < lower_limit , lower_limit , df['Total Count']))
+
+sns.boxplot(df['Total Count'])
+
+sns.boxplot(df['Monocytes   (%)'])
+
+sns.boxplot(df['RBC  (million cells/microliter)'])
+
+# This code calculates the interquartile range (IQR) for the 'Monocytes (%)' column to determine the upper and lower limits for detecting outliers, then caps the values in 'Monocytes (%)' to these limits, replacing any values above the upper limit with the upper limit and any values below the lower limit with the lower limit.
+
+q1 = df['Monocytes   (%)'].quantile(0.25)
+q3 = df['Monocytes   (%)'].quantile(0.75)
+iqr = q3 - q1
+q1,q3,iqr
+upper_limit = q3 + (1.5*iqr)
+lower_limit = q1 - (1.5*iqr)
+lower_limit , upper_limit
+df['Monocytes   (%)'] = np.where(df['Monocytes   (%)'] > upper_limit , upper_limit ,
+                         np.where(df['Monocytes   (%)'] < lower_limit , lower_limit , df['Monocytes   (%)']))
+
+sns.boxplot(df['Monocytes   (%)'])
+
+sns.boxplot(df['Eosinophils   (%)'])
+
+q1 = df['Eosinophils   (%)'].quantile(0.25)
+q3 = df['Eosinophils   (%)'].quantile(0.75)
+iqr = q3 - q1
+q1,q3,iqr
+upper_limit = q3 + (1.5*iqr)
+lower_limit = q1 - (1.5*iqr)
+lower_limit , upper_limit
+df['Eosinophils   (%)'] = np.where(df['Eosinophils   (%)'] > upper_limit , upper_limit ,
+                         np.where(df['Eosinophils   (%)'] < lower_limit , lower_limit , df['Eosinophils   (%)']))
+
+sns.boxplot(df['Eosinophils   (%)'])
+
+sns.boxplot(df['Basophils  (%)'])
+
+q1 = df['Basophils  (%)'].quantile(0.25)
+q3 = df['Basophils  (%)'].quantile(0.75)
+iqr = q3 - q1
+q1,q3,iqr
+upper_limit = q3 + (1.5*iqr)
+lower_limit = q1 - (1.5*iqr)
+lower_limit , upper_limit
+df['Basophils  (%)'] = np.where(df['Basophils  (%)'] > upper_limit , upper_limit ,
+                         np.where(df['Basophils  (%)'] < lower_limit , lower_limit , df['Basophils  (%)']))
+
+sns.boxplot(df['Basophils  (%)'])
+
+sns.boxplot(df['Platelet Count  (lakhs/mm)'])
+
+# This code calculates the interquartile range (IQR) for the 'Platelet Count (lakhs/mm)' column to determine the upper and lower limits for detecting outliers, then caps the values in 'Platelet Count (lakhs/mm)' to these limits, replacing any values above the upper limit with the upper limit and any values below the lower limit with the lower limit.
+
+q1 = df['Platelet Count  (lakhs/mm)'].quantile(0.25)
+q3 = df['Platelet Count  (lakhs/mm)'].quantile(0.75)
+iqr = q3 - q1
+q1,q3,iqr
+upper_limit = q3 + (1.5*iqr)
+lower_limit = q1 - (1.5*iqr)
+lower_limit , upper_limit
+df['Platelet Count  (lakhs/mm)'] = np.where(df['Platelet Count  (lakhs/mm)'] > upper_limit , upper_limit ,
+                         np.where(df['Platelet Count  (lakhs/mm)'] < lower_limit , lower_limit , df['Platelet Count  (lakhs/mm)']))
+
+sns.boxplot(df['Platelet Count  (lakhs/mm)'])
+
+sns.boxplot(df['Direct    (mg/dl)'])
+
+q1 = df['Direct    (mg/dl)'].quantile(0.25)
+q3 = df['Direct    (mg/dl)'].quantile(0.75)
+iqr = q3 - q1
+q1,q3,iqr
+upper_limit = q3 + (1.5*iqr)
+lower_limit = q1 - (1.5*iqr)
+lower_limit , upper_limit
+df['Direct    (mg/dl)'] = np.where(df['Direct    (mg/dl)'] > upper_limit , upper_limit ,
+                         np.where(df['Direct    (mg/dl)'] < lower_limit , lower_limit , df['Direct    (mg/dl)']))
+
+sns.boxplot(df['Direct    (mg/dl)'])
+
+sns.boxplot(df['Indirect     (mg/dl)'])
+
+q1 = df['Indirect     (mg/dl)'].quantile(0.25)
+q3 = df['Indirect     (mg/dl)'].quantile(0.75)
+iqr = q3 - q1
+q1,q3,iqr
+upper_limit = q3 + (1.5*iqr)
+lower_limit = q1 - (1.5*iqr)
+lower_limit , upper_limit
+df['Indirect     (mg/dl)'] = np.where(df['Indirect     (mg/dl)'] > upper_limit , upper_limit ,
+                         np.where(df['Indirect     (mg/dl)'] < lower_limit , lower_limit , df['Indirect     (mg/dl)']))
+
+sns.boxplot(df['Indirect     (mg/dl)'])
+
+sns.boxplot(df['Total Protein     (g/dl)'])
+
+q1 = df['Total Protein     (g/dl)'].quantile(0.25)
+q3 = df['Total Protein     (g/dl)'].quantile(0.75)
+iqr = q3 - q1
+q1,q3,iqr
+upper_limit = q3 + (1.5*iqr)
+lower_limit = q1 - (1.5*iqr)
+lower_limit , upper_limit
+df['Total Protein     (g/dl)'] = np.where(df['Total Protein     (g/dl)'] > upper_limit , upper_limit ,
+                         np.where(df['Total Protein     (g/dl)'] < lower_limit , lower_limit , df['Total Protein     (g/dl)']))
+
+sns.boxplot(df['Albumin   (g/dl)'])
+
+q1 = df['Albumin   (g/dl)'].quantile(0.25)
+q3 = df['Albumin   (g/dl)'].quantile(0.75)
+iqr = q3 - q1
+q1,q3,iqr
+upper_limit = q3 + (1.5*iqr)
+lower_limit = q1 - (1.5*iqr)
+lower_limit , upper_limit
+df['Albumin   (g/dl)'] = np.where(df['Albumin   (g/dl)'] > upper_limit , upper_limit ,
+                         np.where(df['Albumin   (g/dl)'] < lower_limit , lower_limit , df['Albumin   (g/dl)']))
+
+sns.boxplot(df['Globulin  (g/dl)'])
+
+q1 = df['Globulin  (g/dl)'].quantile(0.25)
+q3 = df['Globulin  (g/dl)'].quantile(0.75)
+iqr = q3 - q1
+q1,q3,iqr
+upper_limit = q3 + (1.5*iqr)
+lower_limit = q1 - (1.5*iqr)
+lower_limit , upper_limit
+df['Globulin  (g/dl)'] = np.where(df['Globulin  (g/dl)'] > upper_limit , upper_limit ,
+                         np.where(df['Globulin  (g/dl)'] < lower_limit , lower_limit , df['Globulin  (g/dl)']))
+
+sns.boxplot(df['SGOT/AST      (U/L)'])
+
+q1 = df['SGOT/AST      (U/L)'].quantile(0.25)
+q3 = df['SGOT/AST      (U/L)'].quantile(0.75)
+iqr = q3 - q1
+q1,q3,iqr
+upper_limit = q3 + (1.5*iqr)
+lower_limit = q1 - (1.5*iqr)
+lower_limit , upper_limit
+df['SGOT/AST      (U/L)'] = np.where(df['SGOT/AST      (U/L)'] > upper_limit , upper_limit ,
+                         np.where(df['SGOT/AST      (U/L)'] < lower_limit , lower_limit , df['SGOT/AST      (U/L)']))
+
+from sklearn.preprocessing import LabelEncoder
+le = LabelEncoder()
+
+r column in df.columns:
+    # Check if the column has categorical data
+    if df[column].dtype == 'object':
+        # Perform label encoding
+        df[column] = le.fit_transform(df[column])
+
+df.drop(['Hepatitis B infection','LDL','TG','HDL'],axis=1,inplace=True)
+
+df.drop(['Hepatitis C infection','TCH'],axis=1,inplace=True)
+
+df.columns
+
+from sklearn.model_selection import train_test_split
+
+# Define X (features) and y (target)
+X = df.drop('Diabetes Result', axis=1) 
+y = df['Diabetes Result'] 
+
+# Split data into training and testing sets (80% train, 20% test)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Optionally, you can check the shape of X_train, X_test, y_train, y_test
+print("X_train shape:", X_train.shape)
+print("X_test shape:", X_test.shape)
+print("y_train shape:", y_train.shape)
+print("y_test shape:", y_test.shape)
+
+X_train
+
+pd.DataFrame(y_train).value_counts()
+
+from imblearn.over_sampling import SMOTE
+
+# It balances the class distribution in the training data using SMOTE.
+
+print("Before OverSampling, counts of label '1': {}".format(sum(y_train == 1)))
+print("Before OverSampling, counts of label '2': {} \n".format(sum(y_train == 2)))
+
+from imblearn.over_sampling import SMOTE
+sm = SMOTE(random_state = 2)
+X_train_res, y_train_res = sm.fit_resample(X_train, y_train)   #y_train.ravel()
+
+print('After OverSampling, the shape of train_X: {}'.format(X_train_res.shape))
+print('After OverSampling, the shape of train_y: {} \n'.format(y_train_res.shape))
+
+print("After OverSampling, counts of label '1': {}".format(sum(y_train_res == 1)))
+print("After OverSampling, counts of label '2': {}".format(sum(y_train_res == 2)))
+
+from sklearn.metrics import confusion_matrix, classification_report, accuracy_score, f1_score, recall_score, precision_score
+from sklearn.model_selection import RandomizedSearchCV
+from sklearn.model_selection import GridSearchCV
+
+from sklearn.naive_bayes import GaussianNB
+
+# Create and train the Gaussian Naive Bayes model
+nb = GaussianNB()
+nb.fit(X_train, y_train)
+
+# Print initial training and test scores
+print('Initial Train score:', nb.score(X_train, y_train))
+print('Initial Test score:', nb.score(X_test, y_test))
+
+# No hyperparameters to tune for GaussianNB, directly fitting and scoring
+
+# Make predictions on the test data
+y_pred_nb = nb.predict(X_test)
+
+# Compute confusion matrix
+conf_matrix_nb = confusion_matrix(y_test, y_pred_nb)
+print("Confusion Matrix (Naive Bayes):\n", conf_matrix_nb)
+
+# Compute classification report
+class_report_nb = classification_report(y_test, y_pred_nb)
+print("Classification Report (Naive Bayes):\n", class_report_nb)
+
+# Compute and print accuracy and other metrics
+nb_accuracy = accuracy_score(y_test, y_pred_nb)
+print(f'Accuracy on test set: {nb_accuracy}')
+
+from sklearn.ensemble import RandomForestClassifier
+
+# Create and train the RandomForestClassifier model
+rf = RandomForestClassifier()
+rf.fit(X_train, y_train)
+
+# Print initial training and test scores
+print('Initial Train score:', rf.score(X_train, y_train))
+print('Initial Test score:', rf.score(X_test, y_test))
+
+# Hyperparameter grid for tuning
+param_dist = {
+    'n_estimators': [100, 200, 300, 400, 500],
+    'max_depth': [None, 10, 20, 30, 40, 50],
+    'min_samples_split': [2, 5, 10],
+    'min_samples_leaf': [1, 2, 4],
+    'bootstrap': [True, False]
+}
+
+# RandomizedSearchCV for hyperparameter tuning
+random_search_rf = RandomizedSearchCV(rf, param_dist, n_iter=10, cv=5, n_jobs=-1)
+random_search_rf.fit(X_train, y_train)
+
+# Get the best parameters
+rf_best_params = random_search_rf.best_params_
+
+# Make predictions on the test data with the tuned model
+y_pred = random_search_rf.predict(X_test)
+
+# Compute confusion matrix
+conf_matrix = confusion_matrix(y_test, y_pred)
+print("Confusion Matrix (Random Forest):\n", conf_matrix)
+
+# Compute classification report
+class_report = classification_report(y_test, y_pred)
+print("Classification Report (Random Forest):\n", class_report)
+
+# Compute and print accuracy and other metrics
+rf_accuracy = accuracy_score(y_test, y_pred)
+
+print(f'Optimal hyperparameters for Random Forest: {rf_best_params}')
+print(f'Accuracy on test set: {rf_accuracy}')
+
+from sklearn.linear_model import LogisticRegressionCV
+
+# Create and train the Logistic Regression CV model
+lcv = LogisticRegressionCV(cv=5)
+lcv.fit(X_train, y_train)
+
+# Print initial training and test scores
+print('Initial Train score:', lcv.score(X_train, y_train))
+print('Initial Test score:', lcv.score(X_test, y_test))
+
+# Logistic Regression CV automatically handles hyperparameter tuning with cross-validation
+
+# Make predictions on the test data with the tuned model
+y_pred_lcv = lcv.predict(X_test)
+
+# Compute confusion matrix
+conf_matrix_lcv = confusion_matrix(y_test, y_pred_lcv)
+print("Confusion Matrix (Logistic Regression CV):\n", conf_matrix_lcv)
+
+# Compute classification report
+class_report_lcv = classification_report(y_test, y_pred_lcv)
+print("Classification Report (Logistic Regression CV):\n", class_report_lcv)
+
+# Compute and print accuracy and other metrics
+lcv_accuracy = accuracy_score(y_test, y_pred_lcv)
+print(f'Accuracy on test set: {lcv_accuracy}')
+
+from sklearn.linear_model import RidgeClassifier
+
+# Create and train the Ridge Classifier model
+rg = RidgeClassifier()
+rg.fit(X_train, y_train)
+
+# Print initial training and test scores
+print('Initial Train score:', rg.score(X_train, y_train))
+print('Initial Test score:', rg.score(X_test, y_test))
+
+# Hyperparameter grid for tuning
+param_grid = {'alpha': [0.01, 0.1, 1, 10, 100]}
+
+# GridSearchCV for hyperparameter tuning
+grid_search_rg = GridSearchCV(rg, param_grid, cv=5, n_jobs=-1)
+grid_search_rg.fit(X_train, y_train)
+
+# Get the best parameters
+rg_best_params = grid_search_rg.best_params_
+
+# Make predictions on the test data with the tuned model
+y_pred_rg = grid_search_rg.predict(X_test)
+
+# Compute confusion matrix
+conf_matrix_rg = confusion_matrix(y_test, y_pred_rg)
+print("Confusion Matrix (Ridge Classifier):\n", conf_matrix_rg)
+
+# Compute classification report
+class_report_rg = classification_report(y_test, y_pred_rg)
+print("Classification Report (Ridge Classifier):\n", class_report_rg)
+
+# Compute and print accuracy and other metrics
+rg_accuracy = accuracy_score(y_test, y_pred_rg)
+
+print(f'Optimal hyperparameters for Ridge Classifier: {rg_best_params}')
+print(f'Accuracy on test set: {rg_accuracy}')
+
+from sklearn.svm import SVC
+
+# Create and train the Support Vector Classifier model
+svc = SVC()
+svc.fit(X_train, y_train)
+
+# Make predictions on the test data
+y_pred_svc = svc.predict(X_test)
+
+# Compute and print accuracy
+svc_accuracy = accuracy_score(y_test, y_pred_svc)
+print(f'Accuracy on test set: {svc_accuracy:.2f}')
+
+# Print initial training and test scores
+print('Initial Train score:', svc.score(X_train, y_train))
+print('Initial Test score:', svc.score(X_test, y_test))
+
+# Compute confusion matrix
+conf_matrix_svc = confusion_matrix(y_test, y_pred_svc)
+print("Confusion Matrix (Support Vector Classifier):\n", conf_matrix_svc)
+
+# Compute classification report
+class_report_svc = classification_report(y_test, y_pred_svc)
+print("Classification Report (Support Vector Classifier):\n", class_report_svc)
+
+from sklearn.linear_model import LogisticRegression
+
+# Create and train the Logistic Regression model
+log = LogisticRegression()
+log.fit(X_train, y_train)
+
+# Print initial training and test scores
+print('Initial Train score:', log.score(X_train, y_train))
+print('Initial Test score:', log.score(X_test, y_test))
+
+# Hyperparameter grid for tuning
+param_grid = {'C': [0.01, 0.1, 1, 10, 100], 'penalty': ['l1', 'l2', 'elasticnet', 'none']}
+
+# GridSearchCV for hyperparameter tuning
+grid_search_log = GridSearchCV(log, param_grid, cv=5, n_jobs=-1)
+grid_search_log.fit(X_train, y_train)
+
+# Get the best parameters
+log_best_params = grid_search_log.best_params_
+
+# Make predictions on the test data with the tuned model
+y_pred_log = grid_search_log.predict(X_test)
+
+# Compute confusion matrix
+conf_matrix_log = confusion_matrix(y_test, y_pred_log)
+print("Confusion Matrix (Logistic Regression):\n", conf_matrix_log)
+
+# Compute classification report
+class_report_log = classification_report(y_test, y_pred_log)
+print("Classification Report (Logistic Regression):\n", class_report_log)
+
+# Compute and print accuracy and other metrics
+log_accuracy = accuracy_score(y_test, y_pred_log)
+print(f'Optimal hyperparameters for Logistic Regression: {log_best_params}')
+print(f'Accuracy on test set: {log_accuracy}')
+
+from xgboost import XGBClassifier
+
+# Create and train the XGBoost model
+model = XGBClassifier()
+model.fit(X_train, y_train)
+
+# Print initial training and test scores
+print('Initial Train score:', model.score(X_train, y_train))
+print('Initial Test score:', model.score(X_test, y_test))
+
+# Make predictions on the test data
+y_pred_xgb = model.predict(X_test)
+
+# Compute and print accuracy
+xgb_accuracy = accuracy_score(y_test, y_pred_xgb)
+print(f'Accuracy on test set: {xgb_accuracy:.2f}')
+
+# Compute confusion matrix
+conf_matrix_xgb = confusion_matrix(y_test, y_pred_xgb)
+print("Confusion Matrix (XGBoost):\n", conf_matrix_xgb)
+
+# Compute classification report
+class_report_xgb = classification_report(y_test, y_pred_xgb)
+print("Classification Report (XGBoost):\n", class_report_xgb)
+
+from sklearn.neighbors import KNeighborsClassifier
+
+
+# Create and train the KNeighborsClassifier model
+knn = KNeighborsClassifier()
+knn.fit(X_train, y_train)
+
+# HYPERPARAMETER TUNING
+
+k = np.random.randint(1, 50, 60)
+params = {'n_neighbors': k}
+
+random_search = RandomizedSearchCV(knn, params, n_iter=5, cv=5, n_jobs=-1, verbose=0)
+random_search.fit(X_train, y_train)
+
+# Get the best parameters
+knn_best_params = random_search.best_params_
+
+# Print training and test scores with tuned model
+print('Train score with tuned model:', random_search.score(X_train, y_train))
+print('Test score with tuned model:', random_search.score(X_test, y_test))
+
+# Print optimal hyperparameters
+print(f'Optimal hyperparameters for KNN: {knn_best_params}')
+
+# Make predictions on the test data with the tuned model
+y_pred_knn = random_search.predict(X_test)
+
+# Compute and print accuracy
+knn_accuracy = accuracy_score(y_test, y_pred_knn)
+print(f'Accuracy on test set: {knn_accuracy:.2f}')
+
+# Compute confusion matrix
+conf_matrix_knn = confusion_matrix(y_test, y_pred_knn)
+print("Confusion Matrix (KNN):\n", conf_matrix_knn)
+
+# Compute classification report
+class_report_knn = classification_report(y_test, y_pred_knn)
+print("Classification Report (KNN):\n", class_report_knn)
+
+from sklearn.preprocessing import StandardScaler
+
+# Define your model list with trained models
+model_list = {
+    'logistic regression': log,
+    'logistic regression CV': lcv,
+    'naive bayes': nb,
+    'XGBoost': model,
+    'Ridge classifier': rg,
+    'Random Forest': rf,
+    'Support Vector Classifier': svc,
+    'KNN': knn  # Assuming knn is your trained KNN model
+}
+
+# Function to evaluate each model
+def eval(name, model, X_train, X_test, y_test):
+    # Check if model has been fitted
+    if hasattr(model, "predict"):
+        if name in ['naive bayes', 'XGBoost', 'Random Forest', 'Support Vector Classifier']:
+            # For models that require normalization
+            scaler = StandardScaler()
+            scaler.fit(X_train)
+            X_test_normalized = scaler.transform(X_test)
+            y_pred = model.predict(X_test_normalized)
+        else:
+            # For models that do not need normalization (e.g., KNN)
+            y_pred = model.predict(X_test)
+        
+        result = [
+            name,
+            "{:.2f}".format(accuracy_score(y_test, y_pred) * 100),
+            "{:.2f}".format(f1_score(y_test, y_pred) * 100),
+            "{:.2f}".format(recall_score(y_test, y_pred) * 100),
+            "{:.2f}".format(precision_score(y_test, y_pred) * 100)
+        ]
+    else:
+        # Handle case where the model has not been fitted
+        result = [name, "Model not fitted"] * 4
+
+    return result
+
+# Evaluate each model and store results
+model_eval_info = []
+for name, model in model_list.items():
+    model_eval_info.append(eval(name, model, X_train, X_test, y_test))
+
+# Convert results to a DataFrame and save to CSV
+model_eval_info_df = pd.DataFrame(model_eval_info, columns=['Name', 'Accuracy', 'F1 Score', 'Precision', 'Recall'])
+model_eval_info_df.to_csv('model_eval.csv', index=False)
+
+print(model_eval_info_df)
+
+
+import pickle
+
+filename = 'liver_prediction.pkl'
+pickle.dump(knn, open(filename, 'wb'))
+
+X.info()
+
+Diabetes_Results = ['Yes','No']
+
+pred_value = knn.predict([[12.2,13,14,111,3456,245,367,1,9,87,65,34,69,23,55.55,667.67,135,1,4,6,89.876,22,45,60.06,43.356,23.21,8,90.9,73,34,31]])
+prediction = int(pred_value[0])
+
+prediction = Diabetes_Results[prediction]
+
+prediction
+
+pd.set_option('display.max_columns', None)
+df.head()
+
+# Save the cleaned and processed DataFrame to a CSV file
+df.to_csv('cleaned_data.csv', index=False)
+df.head()
+
